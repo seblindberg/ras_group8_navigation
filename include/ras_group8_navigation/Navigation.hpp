@@ -3,13 +3,13 @@
 #include <ros/ros.h>
 #include <phidgets/motor_encoder.h>
 
-namespace ras_group8_template {
+namespace ras_group8_navigation {
 
-class Template
+class Navigation
 {
 public:
-  Template(ros::NodeHandle& nodeHandle);
-  virtual ~Template();
+  Navigation(ros::NodeHandle& nodeHandle);
+  virtual ~Navigation();
 
 private:
   bool readParameters();

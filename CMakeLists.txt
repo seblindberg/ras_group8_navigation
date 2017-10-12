@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ras_group8_template)
+project(ras_group8_navigation)
 
 find_package(catkin REQUIRED
   COMPONENTS
@@ -24,8 +24,8 @@ include_directories(
 )
 
 add_executable(${PROJECT_NAME}
-  src/template_node.cpp
-  src/Template.cpp
+  src/navigation_node.cpp
+  src/Navigation.cpp
 )
 
 add_dependencies(${PROJECT_NAME}
@@ -36,11 +36,11 @@ target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
 
-catkin_add_gtest(template_tests test/test_template.cpp src/Template.cpp)
+#catkin_add_gtest(navigation_tests test/test_navigation.cpp src/Navigation.cpp)
 
 # Make main executable
 install(
-  TARGETS ${PROJECT_NAME}
+  TARGETS keyboard_navigation
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
