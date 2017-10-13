@@ -31,6 +31,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+#
+# Main node
+#
+
 add_executable(${PROJECT_NAME}
   src/navigation_node.cpp
   src/Navigation.cpp
@@ -49,6 +53,31 @@ target_link_libraries(${PROJECT_NAME}
 # Make main executable
 install(
   TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+#
+# Client node
+#
+
+add_executable(${PROJECT_NAME}_client
+  src/navigation_client_node.cpp
+  #src/NavigationClient.cpp
+)
+
+add_dependencies(${PROJECT_NAME}_client
+  ${catkin_EXPORTED_TARGETS}
+)
+
+target_link_libraries(${PROJECT_NAME}_client
+  ${catkin_LIBRARIES}
+)
+
+# Make client executable
+install(
+  TARGETS ${PROJECT_NAME}_client
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

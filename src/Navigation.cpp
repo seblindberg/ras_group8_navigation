@@ -94,11 +94,13 @@ void Navigation::odomCallback(const nav_msgs::Odometry& msg)
 
 void Navigation::actionGoalCallback()
 {
+  ROS_INFO("Received target pose");
   target_pose_ = action_server_.acceptNewGoal()->target_pose.pose;
 }
 
 void Navigation::actionPreemptCallback()
 {
+  ROS_INFO("Canceling goal");
   action_server_.setPreempted();
 }
 
