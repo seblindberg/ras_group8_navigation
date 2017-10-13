@@ -11,14 +11,18 @@
 namespace ras_group8_navigation {
 
 Navigation::Navigation(ros::NodeHandle& node_handle,
+                       const std::string& stop_topic,
                        const std::string& odom_topic,
                        const std::string& cart_topic)
     : node_handle_(node_handle),
       action_server_(node_handle, "navigate", false)
 {
+  stop_subscriber_ =
+    node_handle_.subscribe(stop_topic, 1,
+                           &Navigation::stopCallback, this);
   odom_subscriber_ =
     node_handle_.subscribe(odom_topic, 1,
-                          &Navigation::odomCallback, this);
+                           &Navigation::odomCallback, this);
                           
   cartesian_publisher_ =
     node_handle_.advertise<geometry_msgs::Twist>(cart_topic, 1);
@@ -39,6 +43,11 @@ Navigation::~Navigation()
 {
   odom_subscriber_.shutdown();
   cartesian_publisher_.shutdown();
+}
+
+void Navigation::stopCallback(const std_msgs::Bool& msg)
+{
+  actionPreemptCallback();
 }
 
 void Navigation::odomCallback(const nav_msgs::Odometry& msg)
@@ -102,6 +111,14 @@ void Navigation::actionPreemptCallback()
 {
   ROS_INFO("Canceling goal");
   action_server_.setPreempted();
+  
+  /* Tell the cartesian controller to stop */
+  geometry_msgs::Twist twist_msg;
+  
+  twist_msg.linear.x = 0;
+  twist_msg.angular.z = 0;
+  
+  cartesian_publisher_.publish(twist_msg);
 }
 
 

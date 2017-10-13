@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ros/ros.h>
+#include <std_msgs/Bool.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Pose.h>
 #include <move_base_msgs/MoveBaseAction.h>
@@ -14,11 +15,13 @@ class Navigation
 {
 public:
   Navigation(ros::NodeHandle& nodeHandle,
+             const std::string& stop_topic,
              const std::string& odom_topic,
              const std::string& cart_topic);
   virtual ~Navigation();
 
 private:
+  void stopCallback(const std_msgs::Bool& msg);
   void odomCallback(const nav_msgs::Odometry& msg);
   
   void actionGoalCallback();
@@ -27,6 +30,7 @@ private:
   /* ROS Objects
    */
   ros::NodeHandle& node_handle_;
+  ros::Subscriber  stop_subscriber_;
   ros::Subscriber  odom_subscriber_;
   ros::Publisher   cartesian_publisher_;
   

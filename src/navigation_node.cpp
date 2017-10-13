@@ -18,6 +18,7 @@ int main(int argc, char** argv)
 
   /* Create main object */
   ras_group8_navigation::Navigation main_object(node_handle,
+                                                "stop",
                                                 odom_topic,
                                                 cart_topic);
 

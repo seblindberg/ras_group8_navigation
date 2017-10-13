@@ -4,6 +4,7 @@ project(ras_group8_navigation)
 find_package(catkin REQUIRED
   COMPONENTS
   roscpp
+  std_msgs
   nav_msgs
   geometry_msgs
   tf
@@ -17,6 +18,7 @@ catkin_package(
 
   CATKIN_DEPENDS
     roscpp
+    std_msgs
     nav_msgs
     geometry_msgs
     move_base_msgs
