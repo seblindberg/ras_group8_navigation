@@ -1,1 +1,2 @@
-subscriber_topic: '/topic'
+odometry_topic: '/odom_topic'
+cartesian_topic: '/cartesian_topic'

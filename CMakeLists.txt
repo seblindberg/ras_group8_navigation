@@ -4,7 +4,11 @@ project(ras_group8_navigation)
 find_package(catkin REQUIRED
   COMPONENTS
   roscpp
-  phidgets
+  nav_msgs
+  geometry_msgs
+  tf
+  move_base_msgs
+  actionlib
 )
 
 catkin_package(
@@ -13,7 +17,11 @@ catkin_package(
 
   CATKIN_DEPENDS
     roscpp
-    phidgets
+    nav_msgs
+    geometry_msgs
+    move_base_msgs
+    actionlib
+    tf
 
 # DEPENDS
 )
@@ -40,7 +48,7 @@ target_link_libraries(${PROJECT_NAME}
 
 # Make main executable
 install(
-  TARGETS keyboard_navigation
+  TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
