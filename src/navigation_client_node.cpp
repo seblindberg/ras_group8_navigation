@@ -70,10 +70,11 @@ int main(int argc, char** argv)
   /* Let the other thread run */
   ac.waitForResult();
   
-  if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+  if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {
     ROS_INFO("Success");
-  else
+  } else {
     ROS_INFO("Failure");
+  }
   
   return 0;
 }

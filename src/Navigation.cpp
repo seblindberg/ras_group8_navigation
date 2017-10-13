@@ -53,8 +53,10 @@ void Navigation::stopCallback(const std_msgs::Bool& msg)
 void Navigation::odomCallback(const nav_msgs::Odometry& msg)
 {
   /* Make sure we are running */
-  if (!action_server_.isActive())
+  if (!action_server_.isActive()) {
+    ROS_INFO("No target");
     return;
+  }
     
   /* Extract x, y and yaw from the msg */
   double x = msg.pose.pose.position.x;
@@ -107,6 +109,13 @@ void Navigation::actionGoalCallback()
 {
   ROS_INFO("Received target pose");
   target_pose_ = action_server_.acceptNewGoal()->target_pose.pose;
+  
+  geometry_msgs::Twist twist_msg;
+  
+  twist_msg.linear.x = 0.2;
+  twist_msg.angular.z = 0;
+  
+  cartesian_publisher_.publish(twist_msg);
 }
 
 void Navigation::actionPreemptCallback()

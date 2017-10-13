@@ -1,2 +1,2 @@
-odometry_topic: '/odom_topic'
-cartesian_topic: '/cartesian_topic'
+odometry_topic: '/ras_group8_odometry/odom_stand'
+cartesian_topic: '/cartesian_controller/twist'
