@@ -80,7 +80,9 @@ void Navigation::odomCallback(const nav_msgs::Odometry& msg)
                    msg.pose.pose.orientation.z,
                    msg.pose.pose.orientation.w);
   
-  double yaw, pitch, roll;
+  double yaw;
+  double pitch;
+  double roll;
   tf::Matrix3x3(q).getEulerYPR(yaw, pitch, roll);
     
   /* Calculate delta angle to the target pose */
