@@ -20,7 +20,8 @@ int main(int argc, char** argv)
   ras_group8_navigation::Navigation main_object(node_handle,
                                                 "stop",
                                                 odom_topic,
-                                                cart_topic);
+                                                cart_topic,
+                                                "navigate");
 
   ros::spin();
   return 0;

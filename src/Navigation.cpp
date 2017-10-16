@@ -13,17 +13,22 @@ namespace ras_group8_navigation {
 Navigation::Navigation(ros::NodeHandle& node_handle,
                        const std::string& stop_topic,
                        const std::string& odom_topic,
-                       const std::string& cart_topic)
+                       const std::string& cart_topic,
+                       const std::string& action_topic)
     : node_handle_(node_handle),
-      action_server_(node_handle, "navigate", false)
+      action_server_(node_handle, action_topic, false)
 {
+  /* Listen for a boolean message to stop the current trajectory. */
   stop_subscriber_ =
     node_handle_.subscribe(stop_topic, 1,
                            &Navigation::stopCallback, this);
+
+  /* Listen to updates from the odometry. */
   odom_subscriber_ =
     node_handle_.subscribe(odom_topic, 1,
                            &Navigation::odomCallback, this);
-                          
+
+  /* Publish cartesian twist messages to drive the vehicle */
   cartesian_publisher_ =
     node_handle_.advertise<geometry_msgs::Twist>(cart_topic, 1);
 
@@ -57,20 +62,16 @@ void Navigation::odomCallback(const nav_msgs::Odometry& msg)
     ROS_INFO("No target");
     return;
   }
-    
-  /* Extract x, y and yaw from the msg */
-  double x = msg.pose.pose.position.x;
-  double y = msg.pose.pose.position.y;
-  
-  double dx = target_pose_.position.x - x;
-  double dy = target_pose_.position.y - y;
+   
+  double dx = target_pose_.position.x - msg.pose.pose.position.x;
+  double dy = target_pose_.position.y - msg.pose.pose.position.y;
   
   /* Check distance to target */
   double d = sqrt(dx*dx + dy*dy);
   
   ROS_INFO("Distance to target: %f", d);
   
-  if (d < 0.1) {
+  if (d < 0.1) { /* TODO: Extract as parameter */
     /* Indicate that we are done */
     action_server_.setSucceeded();
     return;
@@ -86,7 +87,7 @@ void Navigation::odomCallback(const nav_msgs::Odometry& msg)
   double pitch;
   double roll;
   tf::Matrix3x3(q).getEulerYPR(yaw, pitch, roll);
-    
+  
   /* Calculate delta angle to the target pose */
   double dtheta = atan2(dy, dx);
   
@@ -99,9 +100,10 @@ void Navigation::odomCallback(const nav_msgs::Odometry& msg)
   if (twist_msg.angular.z < -0.1) {
     twist_msg.angular.z = -0.1; /* Min angular velocity */
   } else if (twist_msg.angular.z > 0.1) {
-    twist_msg.angular.z =  10.1; /* Max angular velocity */
+    twist_msg.angular.z =  0.1; /* Max angular velocity */
   }
   
+  /* Publish the twist message */
   cartesian_publisher_.publish(twist_msg);
 }
 

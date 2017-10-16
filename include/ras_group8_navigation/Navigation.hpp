@@ -17,7 +17,8 @@ public:
   Navigation(ros::NodeHandle& nodeHandle,
              const std::string& stop_topic,
              const std::string& odom_topic,
-             const std::string& cart_topic);
+             const std::string& cart_topic,
+             const std::string& action_topic);
   virtual ~Navigation();
 
 private:
