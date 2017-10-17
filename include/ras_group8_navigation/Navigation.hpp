@@ -9,6 +9,8 @@
 
 namespace ras_group8_navigation {
   
+#define RAS_GROUP8_NAVIGATION_PUBLISH_STATE 1
+  
 typedef actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction> ActionServer;
 
 class Navigation
@@ -36,6 +38,12 @@ private:
   ros::Publisher   cartesian_publisher_;
   
   ActionServer     action_server_;
+  
+#if RAS_GROUP8_NAVIGATION_PUBLISH_STATE
+  ros::Publisher   state_heading_current_publisher_;
+  ros::Publisher   state_heading_target_publisher_;
+  ros::Publisher   state_distance_publisher_;
+#endif
   
   /* Parameters
    */

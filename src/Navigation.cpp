@@ -1,8 +1,11 @@
 #include <ras_group8_navigation/Navigation.hpp>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/PoseStamped.h>
-//#include <tf/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Matrix3x3.h>
+
+#if RAS_GROUP8_NAVIGATION_PUBLISH_STATE
+#include <std_msgs/Float32.h>
+#endif
 
 // STD
 #include <string.h>
@@ -38,6 +41,19 @@ Navigation::Navigation(ros::NodeHandle& node_handle,
     
   action_server_.registerPreemptCallback(
     boost::bind(&Navigation::actionPreemptCallback, this));
+    
+#if RAS_GROUP8_NAVIGATION_PUBLISH_STATE
+  state_heading_current_publisher_ =
+    node_handle_.advertise<std_msgs::Float32>("heading_current", 1);
+    
+  state_heading_target_publisher_ =
+    node_handle_.advertise<std_msgs::Float32>("heading_target", 1);
+    
+  state_distance_publisher_ =
+    node_handle_.advertise<std_msgs::Float32>("distance", 1);
+    
+  ROS_INFO("Compiled with state output");
+#endif
 
   action_server_.start();
 
@@ -55,6 +71,12 @@ void Navigation::stopCallback(const std_msgs::Bool& msg)
   actionPreemptCallback();
 }
 
+/* Odom Callback
+ * Called when a new pose is published from the odometry.
+ *
+ * Calculates the difference between the current pose and the target pose and
+ * steers the robot to it using messages to the cartesian controller.
+ */
 void Navigation::odomCallback(const nav_msgs::Odometry& msg)
 {
   /* Make sure we are running */
@@ -105,8 +127,27 @@ void Navigation::odomCallback(const nav_msgs::Odometry& msg)
   
   /* Publish the twist message */
   cartesian_publisher_.publish(twist_msg);
+  
+#if RAS_GROUP8_NAVIGATION_PUBLISH_STATE
+  std_msgs::Float32 state_msg;
+
+  state_msg.data = yaw;
+  state_heading_current_publisher_.publish(state_msg);
+
+  state_msg.data = dtheta;
+  state_heading_target_publisher_.publish(state_msg);
+
+  state_msg.data = d;
+  state_distance_publisher_.publish(state_msg);
+#endif
 }
 
+/* Goal Callback
+ * Called by actionlib when a new target pose is received.
+ *
+ * When a new target pose is received the old pose is replaced. This behaviour
+ * may change in future versions.
+ */
 void Navigation::actionGoalCallback()
 {
   ROS_INFO("Received target pose");
@@ -120,6 +161,11 @@ void Navigation::actionGoalCallback()
   cartesian_publisher_.publish(twist_msg);
 }
 
+/* Preempt Callback
+ * Called by actionlib when the current goal is cancelled.
+ *
+ * The cartesian controller is updated with zero linear and angular velocity.
+ */
 void Navigation::actionPreemptCallback()
 {
   ROS_INFO("Canceling goal");
