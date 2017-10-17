@@ -1,7 +1,10 @@
 <launch>
 
-  <!-- Launch RAS Group 8 Template Node -->
-  <node pkg="ras_group8_navigation" type="ras_group8_navigation" name="ras_group8_navigation" output="screen">
+  <!-- Launch RAS Group 8 Navigation Node -->
+  <node name="navigation"
+         pkg="ras_group8_navigation"
+        type="ras_group8_navigation"
+      output="screen">
     <rosparam command="load" file="$(find ras_group8_navigation)/config/default.yaml" />
   </node>
 
