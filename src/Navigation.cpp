@@ -62,10 +62,49 @@ Navigation::Navigation(ros::NodeHandle& node_handle,
 
 Navigation::~Navigation()
 {
-  odom_subscriber_.shutdown();
-  cartesian_publisher_.shutdown();
 }
 
+/* Publish Twist
+ * Private method for publishing linear and angular velocity to the cartesian
+ * controller.
+ */
+void Navigation::publishTwist(double x, double w)
+{
+  geometry_msgs::Twist twist_msg;
+  
+  twist_msg.linear.x  = x;
+  twist_msg.angular.z = w;
+  
+  cartesian_publisher_.publish(twist_msg);
+}
+
+/* Pose To Heading
+ * Private method for extracting the heading from a PoseStamped message.
+ *
+ * Converts from quaternion quardinates to yaw, expressed in radians.
+ */
+double Navigation::poseToHeading(const geometry_msgs::Pose& pose)
+{
+  double yaw;
+  double pitch;
+  double roll;
+  
+  /* Convert the orientation to a tf Quaternion */
+  tf::Quaternion q(pose.orientation.x,
+                   pose.orientation.y,
+                   pose.orientation.z,
+                   pose.orientation.w);
+  
+  tf::Matrix3x3(q).getEulerYPR(yaw, pitch, roll);
+  
+  return yaw;
+}
+
+/* Stop Callback
+ * Called when a boolean message is published to the stop topic.
+ *
+ * Stops the current navigation task.
+ */
 void Navigation::stopCallback(const std_msgs::Bool& msg)
 {
   actionPreemptCallback();
@@ -84,7 +123,7 @@ void Navigation::odomCallback(const nav_msgs::Odometry& msg)
     ROS_INFO("No target");
     return;
   }
-   
+  
   double dx = target_pose_.position.x - msg.pose.pose.position.x;
   double dy = target_pose_.position.y - msg.pose.pose.position.y;
   
@@ -96,37 +135,26 @@ void Navigation::odomCallback(const nav_msgs::Odometry& msg)
   if (d < 0.1) { /* TODO: Extract as parameter */
     /* Indicate that we are done */
     action_server_.setSucceeded();
+    publishTwist(0, 0);
     return;
   }
   
-  /* Convert the orientation to a tf Quaternion */
-  tf::Quaternion q(msg.pose.pose.orientation.x,
-                   msg.pose.pose.orientation.y,
-                   msg.pose.pose.orientation.z,
-                   msg.pose.pose.orientation.w);
-  
-  double yaw;
-  double pitch;
-  double roll;
-  tf::Matrix3x3(q).getEulerYPR(yaw, pitch, roll);
+  double yaw = poseToHeading(msg.pose.pose);
   
   /* Calculate delta angle to the target pose */
   double dtheta = atan2(dy, dx);
   
-  /* Steer towords the target pose */
-  geometry_msgs::Twist twist_msg;
+  double w;
   
-  twist_msg.linear.x  = 0.25; /* TODO: set as parameter */
-  twist_msg.angular.z = (dtheta - yaw) * 10; /* 10 hz */
+  w = (dtheta - yaw) * 10; /* 10 hz */
   
-  if (twist_msg.angular.z < -0.1) {
-    twist_msg.angular.z = -0.1; /* Min angular velocity */
-  } else if (twist_msg.angular.z > 0.1) {
-    twist_msg.angular.z =  0.1; /* Max angular velocity */
+  if (w < -0.1) {
+    w = -0.1; /* Min angular velocity */
+  } else if (w > 0.1) {
+    w =  0.1; /* Max angular velocity */
   }
   
-  /* Publish the twist message */
-  cartesian_publisher_.publish(twist_msg);
+  publishTwist(0.1, w); /* TODO: set as parameter */
   
 #if RAS_GROUP8_NAVIGATION_PUBLISH_STATE
   std_msgs::Float32 state_msg;

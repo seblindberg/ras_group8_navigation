@@ -24,11 +24,23 @@ public:
   virtual ~Navigation();
 
 private:
-  void stopCallback(const std_msgs::Bool& msg);
-  void odomCallback(const nav_msgs::Odometry& msg);
+  void
+    publishTwist(double x, double w);
+    
+  double
+    poseToHeading(const geometry_msgs::Pose& pose);
+    
+  void
+    stopCallback(const std_msgs::Bool& msg);
+    
+  void
+    odomCallback(const nav_msgs::Odometry& msg);
   
-  void actionGoalCallback();
-  void actionPreemptCallback();
+  void
+    actionGoalCallback();
+    
+  void
+    actionPreemptCallback();
 
   /* ROS Objects
    */
