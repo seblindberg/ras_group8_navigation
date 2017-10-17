@@ -4,6 +4,7 @@
 #include <std_msgs/Bool.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Pose.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/server/simple_action_server.h>
 
@@ -31,6 +32,9 @@ private:
     poseToHeading(const geometry_msgs::Pose& pose);
     
   void
+    goalCallback(const geometry_msgs::PoseStamped& msg);
+    
+  void
     stopCallback(const std_msgs::Bool& msg);
     
   void
@@ -45,6 +49,7 @@ private:
   /* ROS Objects
    */
   ros::NodeHandle& node_handle_;
+  ros::Subscriber  goal_subscriber_;
   ros::Subscriber  stop_subscriber_;
   ros::Subscriber  odom_subscriber_;
   ros::Publisher   cartesian_publisher_;

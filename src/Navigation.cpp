@@ -132,7 +132,7 @@ void Navigation::odomCallback(const nav_msgs::Odometry& msg)
   
   ROS_INFO("Distance to target: %f", d);
   
-  if (d < 0.1) { /* TODO: Extract as parameter */
+  if (d < 0.05) { /* TODO: Extract as parameter */
     /* Indicate that we are done */
     action_server_.setSucceeded();
     publishTwist(0, 0);
@@ -143,18 +143,19 @@ void Navigation::odomCallback(const nav_msgs::Odometry& msg)
   
   /* Calculate delta angle to the target pose */
   double dtheta = atan2(dy, dx);
-  
+    
   double w;
   
-  w = (dtheta - yaw) * 10; /* 10 hz */
+  w = (yaw - dtheta) * 10; /* 10 hz */
   
-  if (w < -0.1) {
-    w = -0.1; /* Min angular velocity */
-  } else if (w > 0.1) {
-    w =  0.1; /* Max angular velocity */
+  /* TODO: Extract as parameters */
+  if (w < -0.5) {
+    w = -0.5; /* Min angular velocity */
+  } else if (w > 0.5) {
+    w =  0.5; /* Max angular velocity */
   }
   
-  publishTwist(0.1, w); /* TODO: set as parameter */
+  publishTwist(0.2, w); /* TODO: set as parameter */
   
 #if RAS_GROUP8_NAVIGATION_PUBLISH_STATE
   std_msgs::Float32 state_msg;
@@ -183,7 +184,7 @@ void Navigation::actionGoalCallback()
   
   geometry_msgs::Twist twist_msg;
   
-  twist_msg.linear.x = 0.2;
+  twist_msg.linear.x = 0.1;
   twist_msg.angular.z = 0;
   
   cartesian_publisher_.publish(twist_msg);
