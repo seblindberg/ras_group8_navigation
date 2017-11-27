@@ -5,6 +5,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "ras_group8_navigation");
   ros::NodeHandle node_handle("~");
+  ros::Rate loop_rate(0.1);
   
   /* Parameters */
   std::string odom_topic;
@@ -23,6 +24,10 @@ int main(int argc, char** argv)
                                                 cart_topic,
                                                 "navigate");
 
-  ros::spin();
+  while (node_handle.ok()) {
+    ros::spinOnce();
+    main_object.update();
+    loop_rate.sleep();
+  }
   return 0;
 }

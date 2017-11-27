@@ -15,6 +15,9 @@ find_package(catkin REQUIRED
 catkin_package(
   INCLUDE_DIRS
     include
+    
+  LIBRARIES
+    ${PROJECT_NAME}_pure_pursuit
 
   CATKIN_DEPENDS
     roscpp
@@ -34,6 +37,39 @@ include_directories(
 )
 
 #
+# Pure Pursuit
+#
+
+add_library(${PROJECT_NAME}_pure_pursuit
+  src/PurePursuit.cpp
+)
+
+add_dependencies(${PROJECT_NAME}_pure_pursuit
+  ${catkin_EXPORTED_TARGETS}
+)
+
+target_link_libraries(${PROJECT_NAME}_pure_pursuit
+  ${catkin_LIBRARIES}
+)
+
+install(
+  TARGETS ${PROJECT_NAME}_pure_pursuit
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
+if (CATKIN_ENABLE_TESTING)
+  catkin_add_gtest(${PROJECT_NAME}_pure_pursuite_tests
+    test/test_pure_pursuit.cpp
+  )
+
+  target_link_libraries(${PROJECT_NAME}_pure_pursuite_tests
+    ${PROJECT_NAME}_pure_pursuit
+    ${catkin_LIBRARIES}
+  )
+endif()
+
+#
 # Main node
 #
 
@@ -47,6 +83,7 @@ add_dependencies(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
+  ${PROJECT_NAME}_pure_pursuit
   ${catkin_LIBRARIES}
 )
 

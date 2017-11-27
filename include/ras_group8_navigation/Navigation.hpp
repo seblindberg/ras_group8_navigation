@@ -3,10 +3,12 @@
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 #include <nav_msgs/Odometry.h>
+#include <nav_msgs/Path.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/server/simple_action_server.h>
+#include <ras_group8_navigation/PurePursuit.hpp>
 
 namespace ras_group8_navigation {
   
@@ -22,9 +24,17 @@ public:
              const std::string& odom_topic,
              const std::string& cart_topic,
              const std::string& action_topic);
+  
   virtual ~Navigation();
 
+  void
+    update();
+
 private:
+  bool
+    requestPath(const geometry_msgs::PoseStamped& current_pose,
+                const geometry_msgs::PoseStamped& target_pose);
+  
   void
     publishTwist(double x, double w);
     
@@ -66,9 +76,17 @@ private:
    */
   //std::string subscriberTopic_;
   
+  /* Service Clients
+   */
+  ros::ServiceClient path_service_;
+  
   /* Variables
    */
+  nav_msgs::Path path_; /* TODO: we don't really need to store the path */
   geometry_msgs::Pose target_pose_;
+  geometry_msgs::Pose current_pose_;
+  
+  PurePursuit pure_pursuit_;
 };
 
 } /* namespace */
