@@ -29,6 +29,11 @@ static inline void
   projectPoint(const Point *A, const Point *AB, double t, Point *p);
  
 
+PurePursuit::PurePursuit()
+  : lookahead_(0), lookahead_squared_(0)
+{
+}
+
 PurePursuit::PurePursuit(const nav_msgs::Path& path_msg, double lookahead)
   : lookahead_(lookahead), lookahead_squared_(lookahead * lookahead)
 {

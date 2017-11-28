@@ -20,21 +20,24 @@ class Navigation
 {
 public:
   Navigation(ros::NodeHandle& nodeHandle,
+             const std::string& goal_topic,
              const std::string& stop_topic,
              const std::string& odom_topic,
              const std::string& cart_topic,
-             const std::string& action_topic);
+             double pursuit_radius);
   
   virtual ~Navigation();
 
   void
     update();
+    
+  void
+    stop();
+    
+  static Navigation
+    load(ros::NodeHandle& node_handle);
 
 private:
-  bool
-    requestPath(const geometry_msgs::PoseStamped& current_pose,
-                const geometry_msgs::PoseStamped& target_pose);
-  
   void
     publishTwist(double x, double w);
     
@@ -42,7 +45,7 @@ private:
     poseToHeading(const geometry_msgs::Pose& pose);
     
   void
-    goalCallback(const geometry_msgs::PoseStamped& msg);
+    goalCallback(const nav_msgs::Path& msg);
     
   void
     stopCallback(const std_msgs::Bool& msg);
@@ -50,12 +53,6 @@ private:
   void
     odomCallback(const nav_msgs::Odometry& msg);
   
-  void
-    actionGoalCallback();
-    
-  void
-    actionPreemptCallback();
-
   /* ROS Objects
    */
   ros::NodeHandle& node_handle_;
@@ -63,8 +60,6 @@ private:
   ros::Subscriber  stop_subscriber_;
   ros::Subscriber  odom_subscriber_;
   ros::Publisher   cartesian_publisher_;
-  
-  ActionServer     action_server_;
   
 #if RAS_GROUP8_NAVIGATION_PUBLISH_STATE
   ros::Publisher   state_heading_current_publisher_;
@@ -82,11 +77,15 @@ private:
   
   /* Variables
    */
+  const double update_rate_;
   nav_msgs::Path path_; /* TODO: we don't really need to store the path */
   geometry_msgs::Pose target_pose_;
   geometry_msgs::Pose current_pose_;
   
+  bool is_active_;
+  
   PurePursuit pure_pursuit_;
+  double pure_pursuit_radius_;
 };
 
 } /* namespace */

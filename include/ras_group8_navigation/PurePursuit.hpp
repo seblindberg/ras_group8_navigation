@@ -22,6 +22,7 @@ typedef struct {
 class PurePursuit
 {
 public:
+    PurePursuit();
     PurePursuit(const nav_msgs::Path& path_msg, double lookahead);
     
   virtual
@@ -31,8 +32,8 @@ public:
     nextPose(const geometry_msgs::Pose& current_pose);
   
 private:
-  const double lookahead_;
-  const double lookahead_squared_;
+  double lookahead_;
+  double lookahead_squared_;
   std::vector<Segment> segments_;
   
 };
