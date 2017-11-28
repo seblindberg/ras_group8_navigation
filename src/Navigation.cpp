@@ -82,7 +82,7 @@ Navigation::update()
   const double yaw = poseToHeading(current_pose_);
   double target_yaw;
   
-  double v;
+  double v = 0;
   double w;
   
   /* If we are close enough we want to assume the correct
@@ -90,7 +90,6 @@ Navigation::update()
   if (d < 0.05) { /* TODO: Extract as parameter */
     target_yaw = poseToHeading(target_pose);
     
-    v = 0;
     w = (yaw - target_yaw) * update_rate_;
     
     if (fabs(w) < 0.05) {
@@ -100,10 +99,16 @@ Navigation::update()
   } else {
     /* Calculate the yaw angle to the target pose */
     target_yaw = atan2(dy, dx);
+    const double dyaw = yaw - target_yaw;
     
+    w = dyaw * update_rate_; /* 10 hz */
     
-    v = 0.2; /* Use constant velocity */
-    w = (yaw - target_yaw) * update_rate_; /* 10 hz */
+    /* Only go forward when the yaw difference is smaller
+       than ~ 30 degrees */
+    if (dyaw < 0.5) {
+      v = 0.2; /* Use constant velocity */
+    }
+    
   }
 
   /* TODO: Extract as parameters */
