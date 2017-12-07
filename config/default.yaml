@@ -1,2 +1,3 @@
-odometry_topic: '/ras_group8_odometry/odom_stand'
-cartesian_topic: '/cartesian_controller/twist'
+odom_topic: '/ras_group8_localization/pose'
+cart_topic: '/cartesian_controller/twist'
+stop_topic: '/stop_robot/isstop'

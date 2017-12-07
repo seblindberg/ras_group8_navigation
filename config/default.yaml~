@@ -1,0 +1,2 @@
+odom_topic: '/ras_group8_localization/pose'
+cart_topic: '/cartesian_controller/twist'

@@ -40,7 +40,9 @@ PurePursuit::PurePursuit(const nav_msgs::Path& path_msg, double lookahead)
   const int segments_len = path_msg.poses.size() - 1;
   
   /* We assume there are at least one line segment in the path */
-  ROS_ASSERT(segments_len >= 1);
+  if (segments_len < 1) {
+    return;
+  }
   
   segments_.resize(segments_len);
   
@@ -50,6 +52,8 @@ PurePursuit::PurePursuit(const nav_msgs::Path& path_msg, double lookahead)
   
   J.x = path_msg.poses[0].pose.position.x;
   J.y = path_msg.poses[0].pose.position.y;
+  
+  final_heading_ = path_msg.poses[segments_len].pose.orientation;
   
   /* Pre calculate what we can here */
   for (int i = 0; i < segments_len; i ++) {
@@ -78,6 +82,10 @@ PurePursuit::nextPose(const geometry_msgs::Pose& current_pose)
 {
   Point o;
   const int segments_len = segments_.size();
+  
+  if (segments_len == 0) {
+    return current_pose;
+  }
   
   o.x = current_pose.position.x;
   o.y = current_pose.position.y;
@@ -151,6 +159,8 @@ PurePursuit::nextPose(const geometry_msgs::Pose& current_pose)
   
   next_pose.position.x = q.x;
   next_pose.position.y = q.y;
+  
+  next_pose.orientation = final_heading_;
   
   return next_pose;
 }

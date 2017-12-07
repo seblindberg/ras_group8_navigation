@@ -3,6 +3,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Pose.h>
 #include <nav_msgs/Path.h>
+#include <geometry_msgs/Quaternion.h>
 
 namespace ras_group8_navigation {
 
@@ -34,6 +35,7 @@ public:
 private:
   double lookahead_;
   double lookahead_squared_;
+  geometry_msgs::Quaternion final_heading_;
   std::vector<Segment> segments_;
   
 };

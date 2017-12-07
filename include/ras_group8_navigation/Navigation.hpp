@@ -24,15 +24,19 @@ public:
              const std::string& stop_topic,
              const std::string& odom_topic,
              const std::string& cart_topic,
+             const std::string& done_topic,
              double pursuit_radius);
   
   virtual ~Navigation();
 
   void
-    update();
+    update(const ros::TimerEvent& timer_event);
     
   void
     stop();
+    
+  void
+    run(double update_rate);
     
   static Navigation
     load(ros::NodeHandle& node_handle);
@@ -60,12 +64,16 @@ private:
   ros::Subscriber  stop_subscriber_;
   ros::Subscriber  odom_subscriber_;
   ros::Publisher   cartesian_publisher_;
+  ros::Publisher   done_publisher_;
   
 #if RAS_GROUP8_NAVIGATION_PUBLISH_STATE
+  ros::Publisher   state_target_pose_publisher_;
   ros::Publisher   state_heading_current_publisher_;
   ros::Publisher   state_heading_target_publisher_;
   ros::Publisher   state_distance_publisher_;
 #endif
+  
+  ros::Timer update_timer_;
   
   /* Parameters
    */
@@ -77,7 +85,7 @@ private:
   
   /* Variables
    */
-  const double update_rate_;
+  double update_rate_;
   nav_msgs::Path path_; /* TODO: we don't really need to store the path */
   geometry_msgs::Pose target_pose_;
   geometry_msgs::Pose current_pose_;
